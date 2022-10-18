@@ -31,7 +31,7 @@ docker exec -it gitlab grep 'Password:' /etc/gitlab/initial_root_password # 깃�
 
 도커 컴포즈로 처리하기 .
 
-```yml
+```**yml**
 version: '3.6'
 services:
   web:
