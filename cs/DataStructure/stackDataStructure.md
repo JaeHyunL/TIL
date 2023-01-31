@@ -10,7 +10,7 @@ public class IntStack {
 
     // 스택이 비어있을경우 Exception
     public class EmptyIntStackException extends RuntimesException { 
-        public EmptyIntStackException() { }
+        public **EmptyIntStackException**() { }
     };
 
     public class OverflowIntStackException extends RuntimesException { 

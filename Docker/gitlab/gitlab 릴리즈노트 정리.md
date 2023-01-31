@@ -1,4 +1,9 @@
+# 버전 링크..
+
+https://insight.infograb.net/feature/?&min=12_8&max=15_8&tier=core&ranks=top,primary&keyword=
+
 # 13.7
+
 > [ 13.7 릴리즈노트](https://about.gitlab.com/releases/2020/12/22/gitlab-13-7-released/)
 특정 주요 변경사항
 - MR 관련 프로젝트 병합 사항 추가 (검토자 기능 추가) 
