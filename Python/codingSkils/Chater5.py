@@ -228,3 +228,153 @@ print(albert.average_grade())
     완전한 클래스가 제공하는 유연성이 필요하지 않고 가벼운 불변 데이터 컨테이너가필요하다면 namedtuple을 사용하라.
     내부 상태를 표현하는 딕셔너리가 복잡해지면 이 데이터를 관리하는 코드를 여러 클래스로 나눠서 재작성 하라.
 '''
+
+# BETTER WAY 38 간단한 인터페이스의 경우 클래스 대신 함수를 받아라
+# 파이썬 내장 API중 상다수는 함수를 전달해서 ㄷ공작을 원하는 대로 바꿀 수 있게 해준다.
+# API가 실행되는 과정에서 여러분이 전달한 함수를 실행하는 경우
+# 이런 함수를 hook이라고 부른다. 예를 들어 리스트 타입의 sort메서드는
+# 정렬 시 각 인덱스에 대응하는 비교ㄱ 값을 결정하는 선택적인 key 인자를 받을 수 있다.
+# 다음 코드는 key 훅으로 len 내장 함수를 전달해서 이름이 들어 있는 리스트를 이름의 길이에 다라 정렬한다.
+
+names = ['소크라테스', '아르키메데스', '플라톤', '아리스토텔레스']
+names.sort(key=len)
+print(names)
+
+# 훅은 추상 클래스를 통해 정의해야하는 언어도 있지만 파이썬에서는 단수히 인자와 반환값이 
+# 잘 정의된 상태가 없는 함수를 훅으로 사용하는 경우가 많다. 
+# 함수는 클래스보다 정의하거나 기술하기 더 쉬우므로 훅으로 사용하기에는
+# 함수가 이상적이다. 또한 파이썬은 함수를 일급 시민 객체로 취급하기 때문에
+# 함수를 훅으로 사용할 수 잇다.
+# 함수나 메서드가 일급 시민 객체라는 말은 파이썬 언어레서 사용할 수 있는 다른 일반적인 값과 마찬가지로
+# 함수나 메서드를 다른 함수에 넘기거나 변수등으로 참조할 수 있다는 의미이다.
+
+# 예를들어 defaultdict 클래스의 동작을 사용자 정의하고 싶다고 하자
+
+
+def log_missing():
+    print('키 추가됨')
+    return 0
+# 원본 딕셔너리와 변경할 내용이 주어진 경우, log_missing 함수는 로그를 두번 남길 수 있다.
+# (각 로그는 red and orange)에 해당한다.
+
+
+current = {'초록': 12, '파랑': 3}
+
+increments = [
+    ('빨강', 5),
+    ('파랑', 17),
+    ('주황', 9),
+    ('그린이', 1)
+]
+
+result = defaultdict(log_missing, current)
+print('이전: ', dict(result))
+for key, amount in increments:
+    result[key] += amount
+
+print('이후: ', dict(result))
+
+# log_missoinsing 과 같은 함수를 사용할 수 있으면 정해진 동작과 부수 효과를 분리할 수 있기 때문에
+# API를 더 쉽게 만들 수 있따.
+# defaultdict에 전달하는 디폴드 값이 훅이 존재하지 않는 키에 접근한 총횟수를 제공하고 싶다.
+# 이런 기능을 만드는 방법중 하나는 상태가 있는 클로저 함수를 사용하는 것이다.
+# 다음 코드는 이런 클로저가 있는 도우미 함수를 디폴트 값 훅으로 사용한다.
+
+def increments_with_report(current, increments):
+    added_count = 0
+
+    def missing():
+        nonlocal added_count  # 상태가 있는 함수
+        added_count += 1
+        return 0
+
+    result = defaultdict(missing, current)
+    for key, amount in increments:
+        result[key] += amount
+
+    return result, added_count
+
+result, count = increments_with_report(current, increments)
+# assert count == 3
+print(result, count)
+
+# 하지만 상태를 다루기 위한 훅으로 클로저를 사용하면 상태가 없는 함수에 비해 읽기 이해하기 어렵다.
+# 다른 접근 방법은 여러분이 추적하고 싶은 상태를 저장하는 작은 클래스를 정의하는것이다.
+
+
+class CountMissing:
+    def __init__(self):
+        self.added = 0
+
+    def missing(self):
+        self.added += 1
+        return 0
+
+# 다른 언어에서는 COUNTMISSING이 제공하는 인터페이스를 만족하기 위해 DEFAULTdICT코드를 변경해야 할 수도 있지만
+# 파이썬에서는 일급함수 이므로 사용할 객체에 대한 COUNTMISSING.missing
+# 메서드를 직접 defaultdict의 디폴트값 훅으로 전달 할 수 있따.
+# 어떤 함수 인터페이스를 만족하는 객체인스턴스를 만드는것은 아주 쉽다.
+
+
+counter = CountMissing()
+result = defaultdict(counter.missing, current)  # 메서드 참조
+for key, amount in increments:
+    result[key] += amount
+assert counter.added == 3
+
+
+
+# 이 코드를 보면 알 수 있듯이 도우미 클래스로 상태가 있는 클로저와 같은 동작을 제공하는 것이 increments_with_report
+# 같은 함수를 사용하는 것 보다 더 깔끔하다 하지만 클래스 자체만 놓고 보면 CountMissing 클래스의 목적이 무엇인지
+# 분명히 알기는 어렵다. 누가 CountMissing 클래스의 목적이 무엇인지 분명히 알기는 어렵다
+# snrk CountMissing 객체를 만들까? 누가 missing메서드를 호출할까? 이클래스에 나중에 공개메서ㅏ드가 더 추가 될 수도
+# 있을까? DefaultDict 와 함께 사용하는 예제를 보기 전까지 이클래스는 수수낄분ㅇ다]]
+
+# 이런 경우를 더 명확히 표현하기 위해서는 파이썬에서는 클래스에 __call__ 특별 메서드를 정의할 수 있따.
+# 특별 메서드 __call__을 사용하면 객체를 함수처럼 호출 할 수 있따.
+# 그리고 __call__이 정의돈 클래스의 인스턴스에 대해서는 callable 내 장함수를 호출하면
+# 다른 함수나 메서드 처럼 True 가 반환된다.
+# 이런 방식으로 정의돼서 호출 할 수 있는 객체를 Callable 객체라고 부른다.
+
+
+class BetterCountMissing:
+    def __init__(self):
+        self.added = 0
+
+    def __call__(self):
+        self.added += 1
+        return 0
+
+
+counter = BetterCountMissing()
+
+assert counter() == 0
+assert callable(counter)
+
+counter = BetterCountMissing()
+result = defaultdict(counter, current)  # __call__에 의존함
+for key, mount in increments:
+    result[key] += amount
+assert counter.added == 3
+
+# 이 코드가 CountMissing,missing을 사용한 코드 보다 훨 씬 깔끄마핟.
+# __call__ 메서드는 API 훅처럼 함수가 인자로 쓰일 수 있는 부분에 이 클래스의
+# 인스턴스를 사용할 수 있다는 사실을 나타낸다. 코드를 처음 읽는 사용자 들이
+# 이 클래스의 동작을 알아보기 위한 시작점이 __call__ㅇ 이라는 사실을 쉽게 알 수 잇으며
+# 이 클래스를 만든 목적이 상태를 저장하는 클로저 역할이라는 사실을 잘 알 수 있다.
+
+# 무엇보다 가장 좋은 점은 defaultdict가 __call__ 내부에서 어떤 일이 벌어지는지에 대해
+# 전혀 알 필요가 없다는 사실이다. defaultdict에게 필요한 것은 키가 업슨ㄴ 경우 처리하기 위한
+# 디폴트 값 훅 뿐이다. 파이썬은 단순한 함수 인터페이스를 만족시킬 수 잇는 여러가지 방법을 제공하며
+# 여러분은 원하는 목적에 가장 적합하는 방식을 선택하면 된다.
+
+"""
+    기억해야 할 나용
+    파이썬은 여러 컴포넌트 사이에 간단한 인터페이스가 필요할 떄는 클래스를 정의하고 인스턴스 화 하는 대신 간단히 함수를 사용할 수 있다.
+
+    파이썬 함수나 메서드는 일급시민이다. 따라서 함수나 함수 참조식에 사용할 수 있다.
+
+    __call__특별 메서드를 사용하면 클래스의 인스턴스인 객체를 일반 파이썬 함수 처럼 호출 할 수 있다.
+
+    상태를 유지하기 위한 함수가 필요한 경우에는 상태가 있는 클로저를 정의하는 대신__call__메서드가 있는 클래스를 정의할지 고려해보자.
+"""
