@@ -378,3 +378,44 @@ assert counter.added == 3
 
     상태를 유지하기 위한 함수가 필요한 경우에는 상태가 있는 클로저를 정의하는 대신__call__메서드가 있는 클래스를 정의할지 고려해보자.
 """
+
+# Better way 39 객체를 제너릭하게 구성하려면 @classmethod를 통한 다형성을 활용하라
+# 파이썬에서는 객체뿐만 아니라 클래스도 다형성을 지원한다. 클래스가 다형성을 지원한다는 말은 무슨 뜻일까?
+# 왜 클래스가 다형성을 지원하면 좋을까?
+# 다형성을 사용하면 계층을 이루는 여러 클래스가 자신에게 맞는 유일한 메서드 버전을 구현할 수 있다.
+# 이는 같은 인터페이스를 만족하거나 같은 추상 기반 클래스를 공유하는 많은 클래스가 서로 다른
+# 기능을 제공할 수 있다는 뜻이다.(Better way 43: '커스텀 컨테이너 타입은 collections.abc를 상속하라'를 참고)
+# 예를 들어 맵리듀스 구현을 하나 작성하고 있는데 입력 데이터를 표현할 수 있는 공통 클래스가 필요하다고 하자.
+# 다음 코드는 이럴때 사용하기 위해 정의한 하위클래스에서 다시 정의해야하만 하는 read 메서드가 들어있는 공통 클래스를 보여준다.
+
+
+class InputData:
+    def read(self):
+        raise NotImplementedError
+
+# 이 인풋데이터의 구체적인 하위클래스를 만들면서 디스크에서 파일을 읽게 할 수 있다.
+class PathInputData(InputData):
+    def __init__(self, path):
+        super().__init__()
+        self.path = path
+
+    def read(self):
+        with open(self.path) as f:
+            return f.read()
+
+# PathInputData와 같이 원하면 얼마든지 InputData의 하위 클래스를 만들 수 있다.
+# 각 하위 클래스는 처리할 데이터를 돌려주는 공통 read 인터페이스를 구현해야한다.
+# 어떤 InputData의 하위 클래스는 네트워크에서 데이터를 읽을 수 있고, 또 다른 하위클래스는 읽어온 압축
+# 데이터를 투명하게 풀어서 제공할 수도 있다. 가능성은 무공무진하다.
+
+# 비슷한 방법으로 이 입력 데이터를 소비하는 공통바법으로 제공하는 맵리듀스 작업자로 쓸 수 있는 추상인터페이스를
+# 정의하고 싶다.
+
+
+class Worker:
+    def __init__(self, input_data):
+        self.input_data = Input_data
+        self.result = None
+
+    def map(self):
+        raise NotImplementedError
