@@ -414,8 +414,69 @@ class PathInputData(InputData):
 
 class Worker:
     def __init__(self, input_data):
-        self.input_data = Input_data
+        self.input_data = input_data
         self.result = None
 
     def map(self):
         raise NotImplementedError
+
+    def reduce(self, other):
+        raise NotImplementedError
+
+# 다음 코드는 원하는 맵리듀스 기능(새줄 문자의 개수를 셈)을 구현하는 worker의 구체적인 하위 클래스이다.
+
+
+class LineCounteWorker(Worker):
+    def map(self):
+        data = self.input_data_read()
+        self.result = data.count('\n')
+
+    def reduce(self, other):
+        self.result += other.result
+
+# 이 구현은 아주 잘 동작할 것 처럼 보인다. 하지만 모든 요소를 구현하는 과정에서 가장 큰 난관에 부딪혔다. 대체 각 부분은
+# 어떻게 연결해야 할까? 이해하기 가장 쉬운 인터페이스와 추상화를 제공하는 가장 멋진 클래스를 여럿 만들었지만,
+# 객체를 생성해 활용해야만 이 모든 클래스가 쓸모 있게 된다. 각 객체를 만들고 맵 리듀스를 조화롭게 실행하는 책임은 누가 져야 할까?
+# 가장 간단한 접근 방법은 도우미 함수를 활용해 객체를 직접 만들고 연결하는 것이다. 다음 코드는 디렉토리의 목록을 얻어서
+# 그 안에 들어 있는 파일마다 PathInputData 인스턴스를 만든다.
+
+import os
+
+def generate_inputs(data_dir):
+    for name in os.listdir(data_dir):
+        yield PathInputData(os.path.join(data_dir, name))
+
+# 다음으로 방금 generate_inputs를 통해 만든 InputData 인스턴스들을 사용하는 LineCounterWorker 인스턴스를
+# 만든다.
+
+def create_workers(input_list):
+    workers = []
+    for input_data in input_list:
+        workers.append(LineCounterWorker(input_data))
+    return workers
+
+# 이 Worker 인스턴스의 map 단계를 여러 스레드에 공급해서 실행할 수 있다. 그 후 reduce를 반복적으로 호출해서 결과를
+# 최종 값으로 합칠 수 있다.
+
+from threading import Thread
+
+def excute(workers):
+    threads = [Thread(taget=w.map) for w in workers]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    first, *rest = workers
+    for worker in rest:
+        first.reduce(worker)
+    return first.result
+
+# 마지막으로 조합한 이 함수 안에 합쳐서 각 단계를 실행한다.
+
+def mapreduce(data_dir):
+    inputs = generate_inputs(data_dir)
+    workers = create_workers(inputs)
+    return excute(workers)
+
+# 몇 가지 입력 파일 대상으로 이 함수를 실행하보면 아주 훌룡하게 작동한다.
