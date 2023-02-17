@@ -1,3 +1,5 @@
+import random
+from threading import Thread
 from collections import defaultdict, namedtuple
 # BETTER WAY 37 내장타입을 여러 단계로 내포시키기보다는 클래스를 합성하라.
 # 파이썬 내장 딕셔너리 타입을 사용하면 객체의 생명주기 동안 동적인 내부 상태를 잘
@@ -474,9 +476,132 @@ def excute(workers):
 
 # 마지막으로 조합한 이 함수 안에 합쳐서 각 단계를 실행한다.
 
+# 몇 가지 입력 파일 대상으로 이 함수를 실행하보면 아주 훌룡하게 작동한다.
+
+
+class InputData:
+    def read(self):
+        raise NotImplementedError
+
+
+class PathInputData(InputData):
+    def __init__(self, path):
+        super().__init__()
+        self.path = path
+
+    def read(self):
+        with open(self.path, encoding='utf8') as f:
+            return f.read()
+
+
+class Worker:
+    def __init__(self, input_data):
+        self.input_data = input_data
+        self.result = None
+
+    def map(self):
+        raise NotImplementedError
+
+    def reduce(self, other):
+        raise NotImplementedError
+
+
+def geneerate_inputs(data_dir):
+    for name in os.listdir(data_dir):
+        yield PathInputData(os.path.join(data_dir, name))
+
+
+def create_workers(input_list):
+    workers = []
+    for input_data in input_list:
+        workers.append(LineCounteWorker(input_data))
+    return workers
+
+
+def execute(workers):
+    threads = [Thread(target=w.map) for w in workers]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    first, *rest = workers
+    for worker in rest:
+        first.reduce(worker)
+    return first.result
+
+
 def mapreduce(data_dir):
     inputs = generate_inputs(data_dir)
     workers = create_workers(inputs)
+    return execute(workers)
+
+
+def write_test_files(tmpdir):
+    os.makedirs(tmpdir)
+    for i in range(100):
+        with open(os.path.join(tmpdir, str(i)), 'w') as f:
+            f.write('\n' * random.randint(0, 100))
+
+
+tmpdir = 'test_inputs'
+# write_test_files(tmpdir)
+
+# result = mapreduce(tmpdir)
+# print(f'총 {result} 줄 수 가 있슴.')
+
+
+class GenericInputData:
+    def read(self):
+        raise NotImplementedError
+
+    @classmethod
+    def generate_inputs(cls, config):
+        raise NotImplementedError
+
+
+class PathInputData(GenericInputData):
+
+    @classmethod
+    def generate_inputs(cls, config):
+        data_dir = config['data_dir']
+        for name in os.listdir(data_dir):
+            yield cls(os.path.join(data_dir, name))
+
+
+class GenericWorker:
+    def __init__(self, input_data):
+        self.input_data = input_data
+        self.result = None
+
+    def map(self):
+        raise NotImplementedError
+    
+    def reduce(self, other):
+        raise NotImplementedError
+    
+    @classmethod
+    def create_workers(cls, input_class, config):
+        workers = []
+        for input_data in input_class.generate_inputs(config):
+            workers.append(cls(input_data))
+        return workers
+
+
+class LineCounteWorker(GenericWorker):
+    def map(self):
+        data =self.input_data.read()
+        self.result = data.count('\n')
+
+    def reduce(self, other):
+        self.result = other.result
+
+
+def mapreduce(worker_class, input_class, config):
+    workers = worker_class.create_workers(input_class, config)
     return excute(workers)
 
-# 몇 가지 입력 파일 대상으로 이 함수를 실행하보면 아주 훌룡하게 작동한다.
+
+config = {'data_dir', tmpdir}
+result = mapreduce(LineCounteWorker, PathInputData, config)
+print(f"총 {result}")
