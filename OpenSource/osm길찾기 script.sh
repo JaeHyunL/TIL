@@ -1,0 +1,1 @@
+docker run -d -v /data/bahamas-latest.osm.pbf:/data/bahamas-latest.osm.pbf -p 55555:8989 --env JAVA_OPTS="-Xmx2g -Xms2g" israelhikingmap/graphhopper:7.0 --input  /data/bahamas-latest.osm.pbf
