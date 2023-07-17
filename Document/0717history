@@ -1,0 +1,200 @@
+[root@c73256f3462a /]# history
+    1  ls
+    2  pwd
+    3  whoami
+    4  apt
+    5  yum
+    6  systemctl disable
+    7  systemctl
+    8  systemctl
+    9  systemctl
+   10  gettings set org.gnome.
+   11  gettings set org.gnome
+   12  ls
+   13  l
+   14  apt
+   15  yum
+   16  yarn
+   17  dnf
+   18  dnf clean all
+   19  cd /etc/networks
+   20* l
+   21  gedit
+   22  gedit
+   23  ls /etc/
+   24  ls /etc/networks
+   25  cat /etc/nsswitch.conf
+   26  cat /etc/networks
+   27  ifconfig
+   28  yum install ip-tools
+   29* ifconf
+   30  yum install ifconfig
+   31  yum install ping
+   32  yum install ip-tool
+   33  yum install net-tools
+   34  ifconfig
+   35  setstatus
+   36  grubby
+   37  dnf -y install firewall-config
+   38  ls /etc/default/grub
+   39  ls /etc/default/
+   40  ls /etc/default/useradd
+   41  gedit /etc/default/useradd
+   42  gedit
+   43  cat /etc/default/useradd
+   44  vim
+   45  dnf -y install vim
+   46  dnf -y install gedit
+   47  gedit
+   48  gedit ff.txt
+   49  touch ff.txt
+   50  gedit ff.txt
+   51  vim ff.txt
+   52  nano ff.txt
+   53  cd /etc/yum.repos.d/
+   54  ls
+   55  cd /
+   56  vi /etc/yum.repos.d/rocky-addons.repo
+   57  vi /etc/yum.repos.d/rocky-addons.repo
+   58  vi /etc/yum.repos.d/rocky-addons.repo
+   59  vi /etc/yum.repos.d/rocky-addons.repo
+   60  vi /etc/yum.repos.d/rocky-addons.repo
+   61  halt -p
+   62  file
+   63  ls
+   64  file ff.txt
+   65  nire ff.txt
+   66  more  ff.txt
+   67  ls -al
+   68  chmod u+s ff.txt
+   69  ls -al
+   70  ln ff.txt rr.txt
+   71  ls -al
+   72  rr.txt
+   73  ll
+   74  ls
+   75  ls -al
+   76  cat rr.txt
+   77  nano basefile
+   78  vim basefile
+   79  ln basefile hardlink
+   80  ln -s basefile softlink
+   81  ls -il
+   82  cat hardlink
+   83  cat softlink
+   84  mv basefile /var/
+   85  cat hardlink
+   86  cat softlink
+   87  ls
+   88  ls -al
+   89  mv /var/basefile ./basefile
+   90  ls -al
+   91  cat softlink
+   92  cat hardlink
+   93  rpm
+   94  ls /run/media
+   95  ls /root/
+   96  rpm -qa gzip
+   97  rpm -qf gzip
+   98  rpm -f gzip
+   99  rpm -q gzip
+  100  rpm -ql gzip
+  101  rpm -qf gzip
+  102  rpm -qo gzip
+  103  rpm -qi gzip
+  104  rpm -qi mc
+  105  rpm -qi mc
+  106  rpm install mc
+  107  rpm -qip mc
+  108  rpm -i mc
+  109  rpm -Uvh mc
+  110  rpm -e mc
+  111  history
+  112  yum install mc
+  113  rpm -ql mc
+  114  history
+  115  dnf -x rpm -y gropinstall Workstation
+  116  dnf -x rpm -y groupinstall Workstation
+  117  cron
+  118  at
+  119  dnf install cron
+  120  dnf install crontab
+  121  dnf install crone
+  122  dnf install at
+  123  at
+  124  atat --help
+  125  at
+  126  at --help
+  127  at -c ls
+  128  at -c ls
+  129  dnf install crond
+  130  crond
+  131  dnf -y install open*.rpm
+  132  dnf -y install cron
+  133  dnf -y install crontab
+  134  dnf -y install crond
+  135  dnf -y install crone
+  136  dnf -y install crontab
+  137  dnf -y install crontabs
+  138  crontab
+  139  cron
+  140  crone
+  141  systemctl
+  142  systemctl status
+  143  systemctl status crontab
+  144* systemctl status
+  145  gedit
+  146  sestatus
+  147  dnf sestatus
+  148  sestatus
+  149  dnf install sestatus
+  150  sestatus
+  151  dnf install sestatus
+  152  grubby --update-kernal ALL --args selinux=0
+  153  grubby
+  154  dnf install grubby
+  155  grubby --update-kernel ALL --args selinux=0
+  156  grubby --update-kernel ALL --args selinux=0
+  157  grubby --update-kernel ALL --remove-args selinux
+  158  init 6
+  159  reboot
+  160  |
+  161  ls -l /etc | more
+  162  ps -ef | grep bash
+  163  ls -l > list.txt
+  164  ls
+  165  cat list.txt
+  166  ps
+  167  ps tree
+  168  pstree
+  169  yes > /dev/null
+  170  vi myfile.txt & [1] 3592
+  171  vi myfile.txt &
+  172  vi myfile.txt &
+  173  vi myfile.txt &
+  174  vi myfile.txt &
+  175  vi myfile.txt &
+  176  vi myfile.txt &
+  177  vi myfile.txt &
+  178  vi myfile.txt &
+  179  vi myfile.txt &
+  180  vi myfile.txt &
+  181  vi myfile.txt &
+  182  vi myfile.txt &
+  183  vi myfile.txt &
+  184  vi myfile.txt &
+  185  vi myfile.txt &
+  186  vi myfile.txt &
+  187  vi myfile.txt &
+  188  vi myfile.txt &
+  189  vi myfile.txt &
+  190  uname -r
+  191  clear
+  192  uname -r
+  193  adf ㅁㄴㅇㄹ 아니 음 .. ?
+  194  음 ..?
+  195  dnf -y install gcc gcc-c++ make bison flex elfutils-libelf-devel openssl-devel dwarves
+  196  dnf -y install qt5*
+  197  exit
+  198  df
+  199  history
