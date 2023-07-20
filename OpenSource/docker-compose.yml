@@ -1,0 +1,43 @@
+version: '3'
+services:
+  osm-tile-server:
+    image: overv/openstreetmap-tile-server
+    ports:
+      - 12080:80
+    volumes:
+      - /mnt/d/bahamas-latest.osm.pbf:/var/lib/mod_tile
+    environment:
+      - OSM2PGSQL_EXTRA_ARGS="--hstore"
+      - OSM2PGSQL_CACHE="8000"
+      - OSM2PGSQL_NUMPROC="4"
+      - OSM2PGSQL_IMPORT_PLANET="false"
+      - OSM2PGSQL_SLIM="true"
+      - OSM2PGSQL_HOST="database"
+      - OSM2PGSQL_PORT="5432"
+      - OSM2PGSQL_USER="osmuser"
+      - OSM2PGSQL_DB="osmdb"
+    depends_on:
+      - database
+
+  nominatim:
+    image: mediagis/nominatim:4.2
+    ports:
+      - 12081:80
+    volumes:
+      - ./nominatim-data:/var/lib/postgresql/12/main
+    environment:
+      - PGPASSWORD=nominatim
+      - NOMINATIM_PASSWORD=nominatim
+      - NOMINATIM_EMAIL=nominatim@example.com
+    depends_on:
+      - database
+
+  database:
+    image: mdillon/postgis:9.5
+    volumes:
+      - ./postgis-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=osmuser
+      - POSTGRES_PASSWORD=osmpassword
+      - POSTGRES_DB=osmdb
+
